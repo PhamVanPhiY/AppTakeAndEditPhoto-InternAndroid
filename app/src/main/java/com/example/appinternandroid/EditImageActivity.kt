@@ -3,6 +3,10 @@ package com.example.appinternandroid
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.BlurMaskFilter
+import android.graphics.drawable.BitmapDrawable
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
@@ -23,7 +27,7 @@ class EditImageActivity : AppCompatActivity() {
     private lateinit var cropImageLauncher: ActivityResultLauncher<Intent>
     private lateinit var saveButton: Button
     private var hasEdited = false
-    private var editedImageUri: Uri? = null
+    private var editedBitmap: Bitmap? = null // Thay đổi từ editedImageUri thành editedBitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +53,11 @@ class EditImageActivity : AppCompatActivity() {
 
         cropImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                editedImageUri = UCrop.getOutput(result.data!!)
+                val editedImageUri = UCrop.getOutput(result.data!!)
                 if (editedImageUri != null) {
-                    imageView.setImageURI(editedImageUri)
+                    val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(editedImageUri))
+                    imageView.setImageBitmap(bitmap)
+                    editedBitmap = bitmap // Lưu bitmap đã cắt
                     enableSaveButton()
                 }
             }
@@ -71,13 +77,18 @@ class EditImageActivity : AppCompatActivity() {
         }
 
         backButton.setOnClickListener {
-            finish()
+            val intent = Intent(this, PhotoListActivity::class.java)
+            startActivity(intent)
         }
 
         btnRotate.setOnClickListener {
             enableSaveButton()
         }
+
         btnBlur.setOnClickListener {
+            val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+            editedBitmap = blurBitmap(bitmap, 20f) // Lưu bitmap đã làm mờ
+            imageView.setImageBitmap(editedBitmap)
             enableSaveButton()
         }
 
@@ -96,24 +107,18 @@ class EditImageActivity : AppCompatActivity() {
     private fun saveEditedImage() {
         val originalImagePath = intent.getStringExtra("imagePath") ?: return
 
-        editedImageUri?.let { uri ->
-            val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
-
-            // Tạo đối tượng File với đường dẫn ảnh gốc
-            val originalFile = File(originalImagePath)
-
+        editedBitmap?.let { bitmap ->
             // Ghi đè tệp gốc bằng ảnh đã chỉnh sửa
-            FileOutputStream(originalFile).use { out ->
+            FileOutputStream(originalImagePath).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
 
             Toast.makeText(this, "Ảnh đã được lưu thành công!", Toast.LENGTH_SHORT).show()
-            finish() // Đóng activity sau khi lưu
+            finish()
         } ?: run {
             Toast.makeText(this, "Lỗi: Không có ảnh để lưu.", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     private fun getCorrectlyOrientedBitmap(imagePath: String): Bitmap? {
         val bitmap = BitmapFactory.decodeFile(imagePath)
@@ -131,5 +136,20 @@ class EditImageActivity : AppCompatActivity() {
     private fun rotateBitmap(source: Bitmap, angle: Float): Bitmap {
         val matrix = android.graphics.Matrix().apply { postRotate(angle) }
         return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    private fun blurBitmap(bitmap: Bitmap, radius: Float): Bitmap {
+        // Tạo bitmap đầu ra
+        val outputBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+        val canvas = Canvas(outputBitmap)
+        val paint = Paint()
+
+        // Thiết lập blur
+        val blurFilter = BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL)
+        paint.maskFilter = blurFilter
+
+        // Vẽ bitmap gốc lên canvas với hiệu ứng làm mờ
+        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+        return outputBitmap
     }
 }
