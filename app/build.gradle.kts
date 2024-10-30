@@ -52,9 +52,12 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
 
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("com.github.bumptech.glide:glide:4.15.1")
+
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+    implementation ("com.github.yalantis:ucrop:2.2.8")
 }
