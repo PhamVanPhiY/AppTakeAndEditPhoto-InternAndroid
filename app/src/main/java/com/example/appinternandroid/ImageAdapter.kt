@@ -30,11 +30,11 @@ class ImageAdapter(private val context: Context, private val imageFiles: List<Fi
 
         val imageFile = imageFiles[position]
 
-        // Sử dụng Glide để tải ảnh và bỏ qua bộ nhớ đệm
+
         Glide.with(context)
             .load(imageFile)
-            .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua bộ nhớ đệm trên đĩa
-            .skipMemoryCache(true) // Bỏ qua bộ nhớ đệm trong RAM
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .skipMemoryCache(true)
             .into(imageView)
 
         return view

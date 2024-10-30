@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 if (isGrant) {
-                    // here all permission granted successfully
+
                     startCamera()
                 } else {
                     var someDenied = false
@@ -167,11 +167,10 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     if (someDenied) {
-                        // here app Setting open because all permission is not granted
-                        // and permanent denied
+
                         appSettingOpen(this)
                     } else {
-                        // here warning permission show
+
                         warningPermissionDialog(this) { _: DialogInterface, which: Int ->
                             when (which) {
                                 DialogInterface.BUTTON_POSITIVE ->

@@ -13,17 +13,17 @@ import java.io.File
 class PhotoListActivity : AppCompatActivity() {
 
     private var isTwoColumns = false
-    private lateinit var gridView: GridView // Khai báo gridView là biến toàn cục
+    private lateinit var gridView: GridView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_list)
 
-        gridView = findViewById(R.id.gridView) // Khởi tạo gridView
+        gridView = findViewById(R.id.gridView)
         val toggleButton = findViewById<ImageButton>(R.id.toggleButton)
         val backButton = findViewById<ImageButton>(R.id.btnBack)
 
-        loadImages() // Gọi phương thức để tải ảnh lên gridView
+        loadImages()
 
         toggleButton.setOnClickListener {
             isTwoColumns = !isTwoColumns
@@ -38,7 +38,7 @@ class PhotoListActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        loadImages() // Làm mới ảnh khi quay lại
+        loadImages()
     }
 
     private fun loadImages() {
@@ -48,13 +48,16 @@ class PhotoListActivity : AppCompatActivity() {
                 file.isFile && (file.extension == "jpg" || file.extension == "png")
             }?.toList() ?: emptyList()
 
-            if (imageFiles.isNotEmpty()) {
-                val adapter = ImageAdapter(this, imageFiles)
-                gridView.adapter = adapter // Gán adapter mới cho gridView
-                adapter.notifyDataSetChanged() // Yêu cầu adapter cập nhật
+
+            val sortedImages = imageFiles.sortedByDescending { it.lastModified() }
+
+            if (sortedImages.isNotEmpty()) {
+                val adapter = ImageAdapter(this, sortedImages)
+                gridView.adapter = adapter
+                adapter.notifyDataSetChanged()
 
                 gridView.setOnItemClickListener { _, _, position, _ ->
-                    val selectedImage = imageFiles[position]
+                    val selectedImage = sortedImages[position]
                     selectedImage?.let {
                         val intent = Intent(this, EditImageActivity::class.java)
                         intent.putExtra("imagePath", it.absolutePath)
@@ -70,5 +73,4 @@ class PhotoListActivity : AppCompatActivity() {
             Toast.makeText(this, "Thư mục chứa ảnh không tồn tại.", Toast.LENGTH_SHORT).show()
         }
     }
-
 }

@@ -27,7 +27,7 @@ class EditImageActivity : AppCompatActivity() {
     private lateinit var cropImageLauncher: ActivityResultLauncher<Intent>
     private lateinit var saveButton: Button
     private var hasEdited = false
-    private var editedBitmap: Bitmap? = null // Thay đổi từ editedImageUri thành editedBitmap
+    private var editedBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,7 +108,7 @@ class EditImageActivity : AppCompatActivity() {
         val originalImagePath = intent.getStringExtra("imagePath") ?: return
 
         editedBitmap?.let { bitmap ->
-            // Ghi đè tệp gốc bằng ảnh đã chỉnh sửa
+
             FileOutputStream(originalImagePath).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
@@ -139,16 +139,16 @@ class EditImageActivity : AppCompatActivity() {
     }
 
     private fun blurBitmap(bitmap: Bitmap, radius: Float): Bitmap {
-        // Tạo bitmap đầu ra
+
         val outputBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
         val canvas = Canvas(outputBitmap)
         val paint = Paint()
 
-        // Thiết lập blur
+
         val blurFilter = BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL)
         paint.maskFilter = blurFilter
 
-        // Vẽ bitmap gốc lên canvas với hiệu ứng làm mờ
+
         canvas.drawBitmap(bitmap, 0f, 0f, paint)
         return outputBitmap
     }
