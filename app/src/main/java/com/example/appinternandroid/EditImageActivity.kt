@@ -94,17 +94,26 @@ class EditImageActivity : AppCompatActivity() {
     }
 
     private fun saveEditedImage() {
-        if (editedImageUri != null) {
-            val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(editedImageUri!!))
-            val savedImageURI = Uri.fromFile(File(getExternalFilesDir(null), "edited_image.jpg"))
-            FileOutputStream(savedImageURI.toString()).use { out ->
+        val originalImagePath = intent.getStringExtra("imagePath") ?: return
+
+        editedImageUri?.let { uri ->
+            val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
+
+            // Tạo đối tượng File với đường dẫn ảnh gốc
+            val originalFile = File(originalImagePath)
+
+            // Ghi đè tệp gốc bằng ảnh đã chỉnh sửa
+            FileOutputStream(originalFile).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
+
             Toast.makeText(this, "Ảnh đã được lưu thành công!", Toast.LENGTH_SHORT).show()
-        } else {
+            finish() // Đóng activity sau khi lưu
+        } ?: run {
             Toast.makeText(this, "Lỗi: Không có ảnh để lưu.", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun getCorrectlyOrientedBitmap(imagePath: String): Bitmap? {
         val bitmap = BitmapFactory.decodeFile(imagePath)

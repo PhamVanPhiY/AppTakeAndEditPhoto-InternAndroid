@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.BaseAdapter
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.io.File
 
 class ImageAdapter(private val context: Context, private val imageFiles: List<File>) : BaseAdapter() {
@@ -28,7 +29,13 @@ class ImageAdapter(private val context: Context, private val imageFiles: List<Fi
         val imageView = view.findViewById<ImageView>(R.id.imageView)
 
         val imageFile = imageFiles[position]
-        Glide.with(context).load(imageFile).into(imageView)
+
+        // Sử dụng Glide để tải ảnh và bỏ qua bộ nhớ đệm
+        Glide.with(context)
+            .load(imageFile)
+            .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua bộ nhớ đệm trên đĩa
+            .skipMemoryCache(true) // Bỏ qua bộ nhớ đệm trong RAM
+            .into(imageView)
 
         return view
     }
