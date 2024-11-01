@@ -11,5 +11,5 @@
 + Trở về trạng thái ban đầu của ảnh
 + Lưu ảnh
 - Dưới đây là link gg driver chưa video demo ứng dựng này của em :
---->  https://drive.google.com/drive/u/0/folders/10jI_wcBbsSir0vTH_GtXao6c9ET4-OxP
+https://drive.google.com/drive/u/0/folders/10jI_wcBbsSir0vTH_GtXao6c9ET4-OxP
 -Em cảm ơn anh/chị đã đọc ạ !
