@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object :  ImageCapture.OnImageSavedCallback{
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val message = "Photo Capture Succeed : ${outputFileResults.savedUri}"
+                    val message = "Photo Capture Succeed !"
                     Toast.makeText(this@MainActivity,message,Toast.LENGTH_LONG).show()
                 }
 
